@@ -1,10 +1,15 @@
+import { useToast } from "@chakra-ui/react";
 import { useState } from "react";
 import { IoMdArrowBack } from "react-icons/io";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { authApi } from "../../../api/auth"; // ✅ make sure this path is correct
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const toast = useToast();
+  const navigate = useNavigate();
 
   // simple email regex validation
   const validateEmail = (value) => {
@@ -12,7 +17,7 @@ export default function ForgotPassword() {
     return regex.test(value);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!email) {
@@ -26,8 +31,33 @@ export default function ForgotPassword() {
     }
 
     setError("");
-    // ✅ send request to backend API
-    console.log("Reset link sent to:", email);
+
+    try {
+      setLoading(true);
+      const res = await authApi.forgetPassword(email); // ✅ API call
+      console.log(res);
+      navigate("/email-sent" ,{state:{email:email}});
+      toast({
+        title: "Reset Link Sent",
+        description: `A reset link has been sent to ${email}. Please check your inbox.`,
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+
+      setEmail("");
+      // ✅ optional redirect after success
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error?.message || "Something went wrong",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -47,8 +77,8 @@ export default function ForgotPassword() {
               Email Address
             </label>
             <input
-            
               id="email"
+              type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className={`mt-1 block w-full border rounded-md p-2 ${
@@ -61,9 +91,10 @@ export default function ForgotPassword() {
 
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-purple-500 transition"
+            disabled={loading}
+            className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-500 transition disabled:opacity-50"
           >
-            Send Reset Link
+            {loading ? "Sending..." : "Send Reset Link"}
           </button>
         </form>
       </div>

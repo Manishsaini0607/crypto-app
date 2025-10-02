@@ -38,7 +38,7 @@ export function AuthProvider({ children }) {
     } catch (err) {
       toast({
         title: "Login failed",
-        description: err?.message || "Something went wrong",
+        description: err || "Something went wrong",
         status: "error",
         duration: 5000,
         isClosable: true,

@@ -43,6 +43,28 @@ export const authApi = {
       } catch (error) {
         throw error.response.data.message
       }
-    },
+    } ,
 
-  };
+  // ✅ implement forgot password function
+
+  async forgetPassword(email){
+    try {
+      const res = await Axios.post(`${USER_URL}/forgot-password`, { email });
+      return res?.data;
+  } catch (error) {
+    throw error.response.data.message
+  }
+}
+,
+
+async resetPassword(token, password){
+  try {
+    const res = await Axios.post(`${USER_URL}/verify-forgot-mail`, { token, password });
+    return res?.data;
+} catch (error) {
+  throw error.response.data.message
+}
+  }
+
+
+};
