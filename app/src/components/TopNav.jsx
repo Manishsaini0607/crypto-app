@@ -1,6 +1,12 @@
+
 import { FaBars, FaUserTie } from "react-icons/fa";
+import { useAuth } from "../contexts/AuthContext";
+import { Link, useNavigate } from "react-router-dom";
 
 const TopNav = ({ title, onOpen }) => {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+   
   return (
     <div className="px-4 bg-white">
       <div className="max-w-7xl h-16 mx-auto flex items-center justify-between">
@@ -34,14 +40,14 @@ const TopNav = ({ title, onOpen }) => {
           <div className="hidden absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg z-50">
             <ul className="py-1">
               <li>
-                <button className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">
+                <button  onClick={() => { logout(); navigate("/signin"); }} className="block w-full hover:bg-red-400 text-center px-4 py-2 text-gray-700 hover:text-white ">
                   Logout
                 </button>
               </li>
               <li>
-                <button className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">
+                <Link to="/support" className="block w-full text-center px-4 py-2 text-gray-700 hover:bg-gray-100">
                   Support
-                </button>
+                </Link>
               </li>
             </ul>
           </div>

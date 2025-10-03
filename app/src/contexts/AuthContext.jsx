@@ -1,26 +1,47 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import { authApi } from "../api/auth";
+import Cookies from "js-cookie";
 import { useToast } from "@chakra-ui/react";
-import { useNavigate } from "react-router-dom";
+import {jwtDecode} from "jwt-decode";
 
-// Create Context
 const AuthContext = createContext();
 
-
-// AuthProvider component
 export function AuthProvider({ children }) {
-
   const toast = useToast();
-  const [user, setUser] = useState(null);        // user details
-  const [token, setToken] = useState(null);      // JWT / access token
-  const [loading, setLoading] = useState(false); // loading state
+
+  const [user, setUser] = useState(null);        
+  const [token, setToken] = useState(null);      
+  const [loading, setLoading] = useState(false); 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Store Auth Data
+  // 🔹 On first render → load from localStorage
+  useEffect(() => {
+    const savedToken =  Cookies.get("authToken");
+    const savedUser = localStorage.getItem("authUser");
+
+    if (savedToken && savedUser) {
+      setToken(savedToken);
+      setUser(JSON.parse(savedUser));
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  // 🔹 Store Auth Data
   const storeAuthData = (data) => {
     setToken(data.token);
-    setUser(data.user);
+    const userData = { firstName: data.firstName, lastName: data.lastName };
+    setUser(userData);
     setIsAuthenticated(true);
+   const {exp }= jwtDecode(data.token);
+  
+   const expDay = new Date(exp * 1000);
+
+
+    // ✅ Save to localStorage and cookies
+    Cookies.set("authToken", data.token, { expires: expDay, secure: true, sameSite: "Strict" });
+    localStorage.setItem("authUser", JSON.stringify(userData));
+
+    
   };
 
   // 🔹 Login function
@@ -29,12 +50,15 @@ export function AuthProvider({ children }) {
     try {
       const data = await authApi.login(email, password);
       storeAuthData(data);
+
       toast({
         title: "Login successful",
         status: "success",
         duration: 3000,
         isClosable: true,
       });
+
+      return true;
     } catch (err) {
       toast({
         title: "Login failed",
@@ -43,6 +67,7 @@ export function AuthProvider({ children }) {
         duration: 5000,
         isClosable: true,
       });
+      return false;
     } finally {
       setLoading(false);
     }
@@ -50,12 +75,10 @@ export function AuthProvider({ children }) {
 
   // 🔹 Signup function
   const signup = async (firstName, lastName, email, password) => {
-    
     setLoading(true);
     try {
-      const data = await authApi.signup( firstName, lastName, email, password ); // call your signup API
+      const data = await authApi.signup(firstName, lastName, email, password);
       storeAuthData(data); // auto-login after signup
-    
     } catch (err) {
       toast({
         title: "Signup failed",
@@ -64,12 +87,9 @@ export function AuthProvider({ children }) {
         duration: 5000,
         isClosable: true,
       });
-
-    throw err
-
+      throw err;
     } finally {
       setLoading(false);
-      
     }
   };
 
@@ -78,10 +98,15 @@ export function AuthProvider({ children }) {
     setToken(null);
     setUser(null);
     setIsAuthenticated(false);
+
+    // ❌ Clear localStorage
+    Cookies.remove("authToken");
+    localStorage.removeItem("authUser");
+
     toast({
       title: "Logged out",
       status: "info",
-      duration: 2000,
+      duration: 3000,
       isClosable: true,
     });
   };
@@ -95,7 +120,7 @@ export function AuthProvider({ children }) {
   );
 }
 
-// Custom hook for easy access
+// Custom hook
 export function useAuth() {
   return useContext(AuthContext);
 }

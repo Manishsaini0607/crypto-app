@@ -4,8 +4,17 @@ import SupportCard from "./components/SupportCard";
 import InfoCard from "../Dashboard/components/InfoCard";
 import { IoMdMail } from "react-icons/io";
 import { AiTwotoneMessage } from "react-icons/ai";
+import { useAuth } from "../../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const Support = () => {
+  const { isAuthenticated } = useAuth();
+    const navigator = useNavigate();
+   if (!isAuthenticated) {
+      navigator("/signin");
+      
+   } 
+
   return (
     <DashboardLayout>
       {/* vertical spacing between cards */}

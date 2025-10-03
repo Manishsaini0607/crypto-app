@@ -5,12 +5,10 @@ export const authApi = {
  async login(email, password) {
    try {
      const res = await Axios.post(`${USER_URL}/signin`, { email, password });
-     console.log("raw login response →", res);   // <-- add this
-     // res MUST be an object with a .data key
      return res?.data;                           // safe return for now
    } catch (error) {
        throw error.response.data.message
-   }                        // safe return for now
+   }                      
   },
 
 
@@ -20,7 +18,7 @@ export const authApi = {
      return res?.data;
    } catch (error) {
        throw error.response.data.message
-   }                        // safe return for now
+   }                       
   },
 
 

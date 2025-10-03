@@ -4,6 +4,8 @@ import PortfolioSection from "./components/PortfolioSection";
 import PriceSection from "./components/PriceSection";
 import Transactions from "./components/Transactions";
 import InfoCard from "./components/InfoCard";
+import { useAuth } from "../../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 // ───────────────────────────────────────── Loan demo
 const loanInfo = {
@@ -19,6 +21,13 @@ const monthlyPayment = ({ principal, rate, months }) => {
 // ─────────────────────────────────────────────────────
 
 const Dashboard = () => {
+   const { isAuthenticated } = useAuth();
+    const navigator = useNavigate();
+   if (!isAuthenticated) {
+      navigator("/signin");
+      
+   } 
+
   const [payment, setPayment] = useState(null);
 
   /* calculate once on mount */

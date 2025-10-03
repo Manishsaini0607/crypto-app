@@ -1,10 +1,11 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../../contexts/AuthContext';
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export default function Signin() {
   const { login, loading } = useAuth()
+  const  navigate = useNavigate()
 
   const [formData, setFormData] = useState({
     email: '',
@@ -115,12 +116,15 @@ export default function Signin() {
     validateField(name, value);
   };
 
-  const handalSubmit = (e) => {
+  const handalSubmit = async (e) => {
     e.preventDefault();
     const validateResult = validate(formData)
     if (Object.keys(validateResult).length) return
 
-    login(formData.email, formData.password)
+     const success = await login(formData.email, formData.password)
+     if(success){
+      navigate('/')
+     }
 
     // Clear form
     setFormData({

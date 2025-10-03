@@ -3,6 +3,8 @@ import DashboardLayout from "../../components/DashboardLayout";
 import TransactionTable from "./components/TransactionTable"; // expects a “transactions” prop
 import { AiOutlineDownload } from "react-icons/ai";
 import { BsSearch } from "react-icons/bs";
+import { useAuth } from "../../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 /* Tab definitions + demo data ------------------------------------------- */
 const tabs = [
@@ -29,6 +31,13 @@ const toCSV = (rows) =>
   ].join("\n");
 
 const TransactionPage = () => {
+   const { isAuthenticated } = useAuth();
+     const navigator = useNavigate();
+    if (!isAuthenticated) {
+       navigator("/signin");
+       
+    } 
+
   const [activeTab, setActiveTab]   = useState("All");
   const [query, setQuery]           = useState("");
 

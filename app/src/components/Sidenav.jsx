@@ -2,9 +2,11 @@ import { Link, useLocation } from "react-router-dom";
 import { RxDashboard } from "react-icons/rx";
 import { BsArrowDownUp } from "react-icons/bs";
 import { BiSupport } from "react-icons/bi";
+import { useAuth } from "../contexts/AuthContext";
 
 const Sidenav = () => {
   const location = useLocation();
+  const { user} =useAuth()
 
   const isActive = (path) => location.pathname === path;
 
@@ -16,7 +18,7 @@ const Sidenav = () => {
   return (
     <div className="flex flex-col justify-between bg-white w-full lg:w-64 h-screen shadow-none lg:shadow-lg">
       {/* Logo / heading */}
-      <h1 className="text-center text-lg font-semibold pt-14">@admin</h1>
+      <h1 className="text-center text-lg font-semibold pt-14">@{user.firstName} {user.lastName}</h1>
 
       {/* Main nav */}
       <div className="flex-1 mt-6 mx-3">
