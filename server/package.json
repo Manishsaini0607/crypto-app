@@ -2,13 +2,14 @@
   "name": "jwt-auth-typescript-express",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",                   
+    "start": "node dist/app.js",      
+    "dev": "npm-run-all --parallel watch start2",
     "watch": "tsc -w",
-    "start": "node ./dist/app.js",
-    "start2": "nodemon ./dist/app.js",
-    "dev": "npm-run-all --parallel watch start2"
+    "start2": "nodemon dist/app.js"
   },
   "keywords": [],
   "author": "",
