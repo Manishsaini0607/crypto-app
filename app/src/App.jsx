@@ -1,11 +1,10 @@
 import Dashboard from "./pages/Dashboard/Dashboard";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-
 import Support from "./pages/Support/Support";
 import TransactionPage from "./pages/Transaction/Transaction";
 import Signup from "./pages/Auth/singup/Singup";
 import Signin from "./pages/Auth/signin/Signin";
-import RegisterEmainVarify from "./pages/Auth/registerEmainVarify/registerEmainVarify";
+import RegisterEmainVarify from "./pages/Auth/registerEmainVarify/RegisterEmainVarify";
 import RegisterSuccess from "./pages/Auth/registerSuccess/RegisterSuccess";
 import ForgotPassword from "./pages/Auth/forgot-password/ForgotPassword";
 import EmailSentDone from "./pages/Auth/email-sent-done/EmailSentDone";
