@@ -1,9 +1,10 @@
 import express, { ErrorRequestHandler } from "express";
 import createHttpError from "http-errors";
+// Load env/config BEFORE importing any routes/controllers that may read process.env
+import { DB, PORT } from "./config";
 import exampleRoute from "./routes/exampleRoutes";
 import userRoute from "./routes/userRoutes";
 import mongoose from "mongoose";
-import { DB, PORT } from "./config";
 import { errorHandler } from "./middleware/errorHanlder";
 import passport from "passport";
 import kPassport from "./middleware/passport";

@@ -77,8 +77,8 @@ export function AuthProvider({ children }) {
   const signup = async (firstName, lastName, email, password) => {
     setLoading(true);
     try {
-      const data = await authApi.signup(firstName, lastName, email, password);
-      storeAuthData(data); // auto-login after signup
+       await authApi.signup(firstName, lastName, email, password);
+        
     } catch (err) {
       toast({
         title: "Signup failed",

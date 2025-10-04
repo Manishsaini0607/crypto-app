@@ -169,7 +169,6 @@ export default function Signup() {
 
   try {
     await signup(formData.name, formData.surname, formData.email, formData.password);
-    
     setFormData({
       name: '',
       surname: '',

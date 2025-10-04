@@ -5,10 +5,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var express_1 = __importDefault(require("express"));
 var http_errors_1 = __importDefault(require("http-errors"));
+// Load env/config BEFORE importing any routes/controllers that may read process.env
+var config_1 = require("./config");
 var exampleRoutes_1 = __importDefault(require("./routes/exampleRoutes"));
 var userRoutes_1 = __importDefault(require("./routes/userRoutes"));
 var mongoose_1 = __importDefault(require("mongoose"));
-var config_1 = require("./config");
 var errorHanlder_1 = require("./middleware/errorHanlder");
 var passport_1 = __importDefault(require("passport"));
 var passport_2 = __importDefault(require("./middleware/passport"));

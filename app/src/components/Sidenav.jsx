@@ -1,12 +1,26 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { RxDashboard } from "react-icons/rx";
 import { BsArrowDownUp } from "react-icons/bs";
 import { BiSupport } from "react-icons/bi";
 import { useAuth } from "../contexts/AuthContext";
+import { useEffect, useState } from "react";
 
 const Sidenav = () => {
   const location = useLocation();
-  const { user} =useAuth()
+  const navigate = useNavigate();
+  let { user } = useAuth();
+  const [authUser, setAuthUser] = useState(user);
+
+  useEffect(() => {
+    if (!user) {
+      const storedUser = JSON.parse(localStorage.getItem("authUser"));
+      if (storedUser) {
+        setAuthUser(storedUser);
+      } else {
+        navigate("/signin");
+      }
+    }
+  }, [user, navigate]);
 
   const isActive = (path) => location.pathname === path;
 
@@ -15,10 +29,14 @@ const Sidenav = () => {
     { icon: BsArrowDownUp, text: "Transactions", link: "/transactions" },
   ];
 
+  if (!authUser) return null; // Prevent rendering until user is ready
+
   return (
     <div className="flex flex-col justify-between bg-white w-full lg:w-64 h-screen shadow-none lg:shadow-lg">
       {/* Logo / heading */}
-      <h1 className="text-center text-lg font-semibold pt-14">@{user.firstName} {user.lastName}</h1>
+      <h1 className="text-center text-lg font-semibold pt-14">
+        @{authUser.firstName} {authUser.lastName}
+      </h1>
 
       {/* Main nav */}
       <div className="flex-1 mt-6 mx-3">
