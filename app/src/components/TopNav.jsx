@@ -25,7 +25,7 @@ const TopNav = ({ title, onOpen }) => {
         {/* User dropdown */}
         <div className="relative">
           <button
-            className="focus:outline-none"
+            className="focus:outline-none p-3 rounded-full bg-gray-200 hover:bg-gray-100"
             aria-haspopup="true"
             aria-expanded="false"
             aria-label="User menu"

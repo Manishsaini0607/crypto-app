@@ -135,32 +135,44 @@ export default function Signin() {
   };
 
   return (
-    <main className='h-screen w-full flex bg-[#F5F7FA] '>
-      <div className='m-auto bg-white p-6 rounded-2xl shadow-md max-w-[450px] '>
-        <h1 className='text-3xl font-medium mb-4 '>Welcome to Crypto App</h1>
-        <p className='text-[#797E82] text-sm mb-10'>Create a free account by filling data below.</p>
+    <main className='min-h-screen w-full flex bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50'>
+      <div className='m-auto bg-white p-8 rounded-2xl shadow-xl max-w-[450px] backdrop-blur-sm bg-white/90 border border-gray-100'>
+        <div className="text-center mb-8">
+          <h1 className='text-3xl font-bold mb-3 bg-gradient-to-r from-indigo-600 to-purple-600 inline-block text-transparent bg-clip-text'>
+            Welcome to Crypto App
+          </h1>
+          <p className='text-gray-600 text-sm'>Sign in to access your account</p>
+        </div>
 
         <form onSubmit={handalSubmit}>
 
           {/* Email */}
           <div className='mb-6 relative'>
-            <label htmlFor="email" className='text-xs text-[#171717] font-medium '>Email</label>
-            <input
-              type="text"
-              id='email'
-              name='email'
-              onChange={handleChange}
-              value={formData.email}
-              placeholder='Enter your email'
-              className='w-full text-sm border-gray-200 border p-2 rounded-lg'
-            />
-            {errors.email && <p className='text-[10px] absolute text-red-500 '>{errors.email}</p>}
+            <label htmlFor="email" className='text-sm text-gray-700 font-medium block mb-2'>Email</label>
+            <div className="relative group">
+              <input
+                type="text"
+                id='email'
+                name='email'
+                onChange={handleChange}
+                value={formData.email}
+                placeholder='Enter your email'
+                className='w-full text-sm px-4 py-3 rounded-lg border border-gray-200 focus:border-purple-400 focus:ring-purple-100 focus:ring-4 transition-all outline-none'
+              />
+              <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-500 opacity-0 group-hover:opacity-10 transition-opacity pointer-events-none"></div>
+            </div>
+            {errors.email && (
+              <p className='text-xs absolute text-red-500 mt-1 flex items-center'>
+                <span className="mr-1">●</span>
+                {errors.email}
+              </p>
+            )}
           </div>
 
           {/* Password with eye toggle */}
           <div className='mb-6 relative'>
-            <label htmlFor="password" className='text-xs text-[#171717] font-medium '>Password</label>
-            <div className="relative">
+            <label htmlFor="password" className='text-sm text-gray-700 font-medium block mb-2'>Password</label>
+            <div className="relative group">
               <input
                 type={showPassword ? "text" : "password"}
                 id='password'
@@ -168,52 +180,88 @@ export default function Signin() {
                 onChange={handleChange}
                 value={formData.password}
                 placeholder='Enter your Password'
-                className='w-full text-sm border-gray-200 border p-2 rounded-lg pr-10'
+                className='w-full text-sm px-4 py-3 rounded-lg border border-gray-200 focus:border-purple-400 focus:ring-purple-100 focus:ring-4 transition-all outline-none pr-12'
               />
               <button
                 type="button"
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                 onClick={() => setShowPassword(!showPassword)}
               >
-                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                {showPassword ? <FaEyeSlash className="text-lg" /> : <FaEye className="text-lg" />}
               </button>
+              <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-500 opacity-0 group-hover:opacity-10 transition-opacity pointer-events-none"></div>
             </div>
-            {errors.password && <p className='text-[10px] absolute text-red-500 '>{errors.password}</p>}
+            {errors.password && (
+              <p className='text-xs absolute text-red-500 mt-1 flex items-center'>
+                <span className="mr-1">●</span>
+                {errors.password}
+              </p>
+            )}
           </div>
 
           {/* Remember me + forgot */}
-          <div className='mb-6 flex justify-between  items-center'>
-            <div className=' relative w-[70%]'>
-              <input
-                type="checkbox"
-                name="remember"
-                onChange={handleChange}
-                checked={formData.remember}
-                id="remember"
-                className='mr-2 cursor-pointer'
-              />
-              <label htmlFor="remember" className='text-xs text-[#171717] font-medium '>Remember me</label>
-              {errors.remember && <p className='text-[10px] absolute  text-red-500 '>{errors.remember}</p>}
+          <div className='mb-8 flex justify-between items-center'>
+            <div className='relative'>
+              <label className="flex items-center space-x-2 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  name="remember"
+                  onChange={handleChange}
+                  checked={formData.remember}
+                  id="remember"
+                  className='w-4 h-4 border-2 border-gray-300 rounded-sm text-purple-600 focus:ring-purple-500 focus:ring-2 cursor-pointer transition-all'
+                />
+                <span className='text-sm text-gray-600 group-hover:text-gray-900 transition-colors'>Remember me</span>
+              </label>
+              {errors.remember && (
+                <p className='text-xs absolute text-red-500 mt-1 flex items-center'>
+                  <span className="mr-1">●</span>
+                  {errors.remember}
+                </p>
+              )}
             </div>
-            <Link to='/forgot-password' className='text-xs font-semibold hover:underline cursor-pointer text-purple-500 '>
-              Forgot Password!
+            <Link 
+              to='/forgot-password' 
+              className='text-sm font-medium text-purple-600 hover:text-purple-700 transition-colors hover:underline'
+            >
+              Forgot Password?
             </Link>
           </div>
 
           {/* Submit */}
-          <button className='w-full mb-6 p-2 text-white rounded-lg bg-purple-600 text-sm font-medium hover:bg-purple-500 transition'>
-            {loading ? 'Loading...' : 'Sign In'}
+          <button 
+            className='w-full mb-6 py-3 text-white rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 text-sm font-medium 
+              hover:from-indigo-500 hover:to-purple-500 transition-all duration-300 transform hover:-translate-y-0.5 
+              focus:outline-none focus:ring-4 focus:ring-purple-100 shadow-lg hover:shadow-xl'
+          >
+            {loading ? (
+              <span className="flex items-center justify-center">
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Loading...
+              </span>
+            ) : 'Sign In'}
           </button>
 
           {/* Signup */}
-          <Link to="/signup" className=''>
+          <Link to="/signup" className='block'>
             <button
               type="button"
-              className='w-full mb-6 bg-[#D8DDE2] text-gray-500 p-2 hover:text-white rounded-lg text-sm font-medium hover:bg-purple-600 transition'
+              className='w-full py-3 bg-gray-50 text-gray-700 rounded-lg text-sm font-medium 
+                hover:bg-gradient-to-r hover:from-pink-500 hover:to-purple-500 hover:text-white 
+                transition-all duration-300 transform hover:-translate-y-0.5 border border-gray-200 
+                hover:border-transparent focus:outline-none focus:ring-4 focus:ring-purple-100'
             >
               Create New Account
             </button>
           </Link>
+
+          {/* Decorative elements */}
+          <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+       
 
         </form>
       </div>

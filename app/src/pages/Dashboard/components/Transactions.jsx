@@ -27,38 +27,63 @@ const Transactions = () => {
   ];
 
   return (
-    <div className="bg-white rounded-lg shadow p-6 h-full flex flex-col">
-      <p className="mb-6 text-sm text-gray-700">Recent Transactions</p>
+    <div className="bg-white rounded-xl h-full flex flex-col">
+      {/* Header */}
+      <div className="p-6 bg-gradient-to-r from-violet-50 to-purple-50 rounded-t-xl border-b border-gray-100">
+        <div className="flex justify-between items-center">
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900">Recent Transactions</h3>
+            <p className="text-sm text-gray-600 mt-1">Last 24 hours</p>
+          </div>
+          <span className="bg-purple-100 text-purple-700 text-sm font-medium px-3 py-1 rounded-full">
+            Today
+          </span>
+        </div>
+      </div>
 
-      {/* transaction list */}
-      <div className="flex flex-col flex-grow space-y-4 overflow-auto">
+      {/* Transaction list */}
+      <div className="flex-grow overflow-auto p-6 space-y-4">
         {transactions.map((t, i) => (
-          <div key={t.id}>
-            {i !== 0 && <hr className="border-gray-200 mb-4" />}
+          <div key={t.id} className="group">
+            {i !== 0 && <div className="border-b border-gray-100 mb-4" />}
 
-            <div className="flex gap-4 items-center">
-              {/* icon bubble */}
-              <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-                <t.icon />
+            <div className="flex gap-4 items-center p-3 rounded-xl transition-all duration-200 hover:bg-gray-50">
+              {/* Icon bubble */}
+              <div className={`w-12 h-12 rounded-full flex items-center justify-center shadow-sm transition-all duration-200 group-hover:scale-110 
+                ${t.text.includes('Deposit') 
+                  ? 'bg-gradient-to-br from-green-400 to-emerald-500 text-white'
+                  : 'bg-gradient-to-br from-red-400 to-rose-500 text-white'}`}>
+                <t.icon className="text-xl" />
               </div>
 
-              {/* description + amount */}
-              <div className="flex justify-between w-full">
+              {/* Description + amount */}
+              <div className="flex justify-between items-center w-full">
                 <div>
-                  <p className="font-semibold">{t.text}</p>
-                  <p className="text-sm text-gray-400">{t.timestamp}</p>
+                  <p className="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors duration-200">
+                    {t.text}
+                  </p>
+                  <p className="text-sm text-gray-500 flex items-center gap-2">
+                    {t.timestamp}
+                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-gray-300"></span>
+                    <span className="text-green-600">Completed</span>
+                  </p>
                 </div>
-                <p className="font-semibold whitespace-nowrap">{t.amount}</p>
+                <p className={`font-bold whitespace-nowrap text-lg
+                  ${t.amount.includes('+') ? 'text-green-600' : 'text-red-600'}`}>
+                  {t.amount}
+                </p>
               </div>
             </div>
           </div>
         ))}
       </div>
 
-      {/* footer button */}
-      <button className="mt-6 w-full py-2 rounded bg-gray-300 hover:bg-gray-400 focus:outline-none">
-        View All
-      </button>
+      {/* Footer button */}
+      <div className="p-6 bg-gradient-to-r from-violet-50 to-purple-50 rounded-b-xl border-t border-gray-100">
+        <button className="w-full py-3 px-4 bg-gradient-to-r from-violet-600 to-purple-600 text-white rounded-lg font-medium hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
+          View All Transactions
+        </button>
+      </div>
     </div>
   );
 };
