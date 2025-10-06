@@ -119,21 +119,15 @@ export const signupUser: RequestHandler = async (req, res, next) => {
 
     await user.save();
 
-    // Create verification token and send email
+    // Create verification token for later email verification
     const jwtToken = jwt.sign({ userId: user._id }, process.env.JWT_KEY || "", { expiresIn: "60m" });
-    try {
-      await sendVerificationEmail(email, jwtToken, firstName);
-    } catch (mailErr) {
-      console.error("Failed to send verification email (signup):", mailErr);
-      // store token so verification can be completed later
-      await user.updateOne({ $set: { verifyToken: jwtToken } });
-      return res.status(201).json({
-        message: "User created, but verification email could not be sent. Contact support.",
-      });
-    }
-
     await user.updateOne({ $set: { verifyToken: jwtToken } });
-    res.status(201).json({ message: "User Created. Verification email sent." });
+    
+    res.status(201).json({ 
+      message: "User created successfully. Please verify your email to activate your account.",
+      userId: user._id,
+      email: user.email
+    });
   } catch (error) {
     console.error("signupUser error:", error);
     return next(createHttpError(500, "Internal Server Error"));

@@ -152,7 +152,7 @@ var sendForgotPasswordEmail = function (to, token, firstName) { return __awaiter
 }); };
 // -------------------- Signup --------------------
 var signupUser = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, firstName, lastName, email, password, existingUser, hashedPassword, user, jwtToken, mailErr_1, error_1;
+    var _a, firstName, lastName, email, password, existingUser, hashedPassword, user, jwtToken, error_1;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
@@ -161,7 +161,7 @@ var signupUser = function (req, res, next) { return __awaiter(void 0, void 0, vo
                     return [2 /*return*/, next((0, http_errors_1.default)(400, "Email and password are required"))];
                 _b.label = 1;
             case 1:
-                _b.trys.push([1, 11, , 12]);
+                _b.trys.push([1, 6, , 7]);
                 return [4 /*yield*/, User_1.default.findOne({ email: email })];
             case 2:
                 existingUser = _b.sent();
@@ -181,34 +181,20 @@ var signupUser = function (req, res, next) { return __awaiter(void 0, void 0, vo
             case 4:
                 _b.sent();
                 jwtToken = jsonwebtoken_1.default.sign({ userId: user._id }, process.env.JWT_KEY || "", { expiresIn: "60m" });
-                _b.label = 5;
-            case 5:
-                _b.trys.push([5, 7, , 9]);
-                return [4 /*yield*/, sendVerificationEmail(email, jwtToken, firstName)];
-            case 6:
-                _b.sent();
-                return [3 /*break*/, 9];
-            case 7:
-                mailErr_1 = _b.sent();
-                console.error("Failed to send verification email (signup):", mailErr_1);
-                // store token so verification can be completed later
                 return [4 /*yield*/, user.updateOne({ $set: { verifyToken: jwtToken } })];
-            case 8:
-                // store token so verification can be completed later
+            case 5:
                 _b.sent();
-                return [2 /*return*/, res.status(201).json({
-                        message: "User created, but verification email could not be sent. Contact support.",
-                    })];
-            case 9: return [4 /*yield*/, user.updateOne({ $set: { verifyToken: jwtToken } })];
-            case 10:
-                _b.sent();
-                res.status(201).json({ message: "User Created. Verification email sent." });
-                return [3 /*break*/, 12];
-            case 11:
+                res.status(201).json({
+                    message: "User created successfully. Please verify your email to activate your account.",
+                    userId: user._id,
+                    email: user.email
+                });
+                return [3 /*break*/, 7];
+            case 6:
                 error_1 = _b.sent();
                 console.error("signupUser error:", error_1);
                 return [2 /*return*/, next((0, http_errors_1.default)(500, "Internal Server Error"))];
-            case 12: return [2 /*return*/];
+            case 7: return [2 /*return*/];
         }
     });
 }); };
@@ -258,7 +244,7 @@ var signinUser = function (req, res, next) { return __awaiter(void 0, void 0, vo
 exports.signinUser = signinUser;
 // -------------------- Send Verification Email (manual trigger) --------------------
 var sendVerificationMail = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
-    var email, user, jwtToken, mailErr_2, error_3;
+    var email, user, jwtToken, mailErr_1, error_3;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -285,8 +271,8 @@ var sendVerificationMail = function (req, res, next) { return __awaiter(void 0, 
                 _a.sent();
                 return [3 /*break*/, 6];
             case 5:
-                mailErr_2 = _a.sent();
-                console.error("Failed to send verification email (manual):", mailErr_2);
+                mailErr_1 = _a.sent();
+                console.error("Failed to send verification email (manual):", mailErr_1);
                 return [2 /*return*/, next((0, http_errors_1.default)(500, "Failed to send verification email"))];
             case 6: return [4 /*yield*/, user.updateOne({ $set: { verifyToken: jwtToken } })];
             case 7:
@@ -339,7 +325,7 @@ var verifyUserMail = function (req, res, next) { return __awaiter(void 0, void 0
 exports.verifyUserMail = verifyUserMail;
 // -------------------- Forgot Password Email --------------------
 var sendForgotPasswordMail = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
-    var email, user, jwtToken, mailErr_3, error_5;
+    var email, user, jwtToken, mailErr_2, error_5;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -363,8 +349,8 @@ var sendForgotPasswordMail = function (req, res, next) { return __awaiter(void 0
                 _a.sent();
                 return [3 /*break*/, 6];
             case 5:
-                mailErr_3 = _a.sent();
-                console.error("Failed to send password reset email:", mailErr_3);
+                mailErr_2 = _a.sent();
+                console.error("Failed to send password reset email:", mailErr_2);
                 return [2 /*return*/, next((0, http_errors_1.default)(500, "Failed to send password reset email"))];
             case 6: return [4 /*yield*/, user.updateOne({ $set: { verifyToken: jwtToken } })];
             case 7:
