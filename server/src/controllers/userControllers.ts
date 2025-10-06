@@ -15,14 +15,26 @@ import nodemailer from "nodemailer";
  */
 
 // --- Transporter (kept here, no external file changes) ---
+const emailPort = Number(process.env.EMAIL_PORT) || 587;
+const emailSecure = process.env.EMAIL_SECURE
+  ? process.env.EMAIL_SECURE === "true"
+  : emailPort === 465; // auto secure for 465
+
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST || "smtp.gmail.com",
-  port: Number(process.env.EMAIL_PORT) || 587,
-  secure: false, // use STARTTLS on port 587
+  port: emailPort,
+  secure: emailSecure, // true for 465, false for 587 STARTTLS
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
+  // pooling + timeouts help on cloud providers
+  pool: true,
+  maxConnections: 3,
+  maxMessages: 100,
+  connectionTimeout: 15000, // ms
+  greetingTimeout: 10000, // ms
+  socketTimeout: 20000, // ms
   tls: {
     // helpful in some networks; if you face TLS errors, keep; otherwise you can remove it
     rejectUnauthorized: false,
@@ -40,19 +52,47 @@ transporter
     console.error(err);
   });
 
-// --- Safe send wrapper with detailed logs ---
+// small helper for backoff between retries
+const delay = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+
+// --- Safe send wrapper with detailed logs + retries for transient errors ---
 const sendMailSafely = async (opts: nodemailer.SendMailOptions) => {
-  try {
-    const info = await transporter.sendMail(opts);
-    console.log("Email sent:", info.messageId);
-    return info;
-  } catch (err: any) {
-    console.error("Failed to send email:");
-    if (err.code) console.error("Error code:", err.code);
-    if (err.response) console.error("SMTP response:", err.response);
-    console.error(err);
-    throw err;
+  const maxAttempts = 3;
+  let attempt = 0;
+  let lastError: any;
+
+  while (attempt < maxAttempts) {
+    try {
+      const info = await transporter.sendMail(opts);
+      console.log("Email sent:", info.messageId);
+      return info;
+    } catch (err: any) {
+      lastError = err;
+      const code = err?.code as string | undefined;
+      const isTransient =
+        code === "ETIMEDOUT" ||
+        code === "ECONNECTION" ||
+        code === "ECONNRESET" ||
+        code === "EAI_AGAIN" ||
+        code === "ENOTFOUND" ||
+        err?.command === "CONN";
+
+      attempt += 1;
+      console.error(`Failed to send email (attempt ${attempt}/${maxAttempts}):`);
+      if (code) console.error("Error code:", code);
+      if (err?.response) console.error("SMTP response:", err.response);
+      console.error(err);
+
+      if (!isTransient || attempt >= maxAttempts) {
+        throw err;
+      }
+
+      const backoffMs = 500 * Math.pow(2, attempt - 1); // 500ms, 1s, 2s
+      await delay(backoffMs);
+    }
   }
+
+  throw lastError;
 };
 
 // --- Mail helper: generic send ---

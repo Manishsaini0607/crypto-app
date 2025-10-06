@@ -54,14 +54,25 @@ var nodemailer_1 = __importDefault(require("nodemailer"));
  * NOTE: For Gmail use an App Password (with 2FA enabled) in EMAIL_PASS.
  */
 // --- Transporter (kept here, no external file changes) ---
+var emailPort = Number(process.env.EMAIL_PORT) || 587;
+var emailSecure = process.env.EMAIL_SECURE
+    ? process.env.EMAIL_SECURE === "true"
+    : emailPort === 465; // auto secure for 465
 var transporter = nodemailer_1.default.createTransport({
     host: process.env.EMAIL_HOST || "smtp.gmail.com",
-    port: Number(process.env.EMAIL_PORT) || 587,
-    secure: false,
+    port: emailPort,
+    secure: emailSecure,
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
     },
+    // pooling + timeouts help on cloud providers
+    pool: true,
+    maxConnections: 3,
+    maxMessages: 100,
+    connectionTimeout: 15000,
+    greetingTimeout: 10000,
+    socketTimeout: 20000,
     tls: {
         // helpful in some networks; if you face TLS errors, keep; otherwise you can remove it
         rejectUnauthorized: false,
@@ -77,28 +88,54 @@ transporter
     console.error("SMTP transporter verification failed:");
     console.error(err);
 });
-// --- Safe send wrapper with detailed logs ---
+// small helper for backoff between retries
+var delay = function (ms) { return new Promise(function (resolve) { return setTimeout(resolve, ms); }); };
+// --- Safe send wrapper with detailed logs + retries for transient errors ---
 var sendMailSafely = function (opts) { return __awaiter(void 0, void 0, void 0, function () {
-    var info, err_1;
+    var maxAttempts, attempt, lastError, info, err_1, code, isTransient, backoffMs;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                _a.trys.push([0, 2, , 3]);
-                return [4 /*yield*/, transporter.sendMail(opts)];
+                maxAttempts = 3;
+                attempt = 0;
+                _a.label = 1;
             case 1:
+                if (!(attempt < maxAttempts)) return [3 /*break*/, 7];
+                _a.label = 2;
+            case 2:
+                _a.trys.push([2, 4, , 6]);
+                return [4 /*yield*/, transporter.sendMail(opts)];
+            case 3:
                 info = _a.sent();
                 console.log("Email sent:", info.messageId);
                 return [2 /*return*/, info];
-            case 2:
+            case 4:
                 err_1 = _a.sent();
-                console.error("Failed to send email:");
-                if (err_1.code)
-                    console.error("Error code:", err_1.code);
-                if (err_1.response)
+                lastError = err_1;
+                code = err_1 === null || err_1 === void 0 ? void 0 : err_1.code;
+                isTransient = code === "ETIMEDOUT" ||
+                    code === "ECONNECTION" ||
+                    code === "ECONNRESET" ||
+                    code === "EAI_AGAIN" ||
+                    code === "ENOTFOUND" ||
+                    (err_1 === null || err_1 === void 0 ? void 0 : err_1.command) === "CONN";
+                attempt += 1;
+                console.error("Failed to send email (attempt ".concat(attempt, "/").concat(maxAttempts, "):"));
+                if (code)
+                    console.error("Error code:", code);
+                if (err_1 === null || err_1 === void 0 ? void 0 : err_1.response)
                     console.error("SMTP response:", err_1.response);
                 console.error(err_1);
-                throw err_1;
-            case 3: return [2 /*return*/];
+                if (!isTransient || attempt >= maxAttempts) {
+                    throw err_1;
+                }
+                backoffMs = 500 * Math.pow(2, attempt - 1);
+                return [4 /*yield*/, delay(backoffMs)];
+            case 5:
+                _a.sent();
+                return [3 /*break*/, 6];
+            case 6: return [3 /*break*/, 1];
+            case 7: throw lastError;
         }
     });
 }); };
